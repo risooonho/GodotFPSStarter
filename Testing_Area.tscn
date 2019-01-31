@@ -344,6 +344,8 @@ _sections_unfolded = [ "Albedo" ]
 
 [node name="Box" type="Spatial" parent="." index="0"]
 
+editor/display_folded = true
+
 [node name="Floor_plane" type="MeshInstance" parent="Box" index="0"]
 
 editor/display_folded = true

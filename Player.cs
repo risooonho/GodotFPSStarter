@@ -7,7 +7,7 @@ public class Player : KinematicBody
         public string name;
         private string nodePath;
         public int number;
-        private Spatial instance;
+        private WeaponPoint instance;
         public AnimationPlayer.AnimationState idleAnim;
         public AnimationPlayer.AnimationState fireAnim;
 
@@ -19,13 +19,13 @@ public class Player : KinematicBody
             this.fireAnim = fireAnim;
         }
 
-        public Spatial Instance(Player player) {
+        public WeaponPoint Instance(Player player) {
             if (nodePath.Empty()) {
                 return null;
             }
 
             if (instance == null) {
-                this.instance = player.GetNode<Spatial>(nodePath);
+                this.instance = player.GetNode<WeaponPoint>(nodePath);
             }
 
             return instance;
@@ -52,11 +52,11 @@ public class Player : KinematicBody
     private AnimationPlayer animationPlayer;
 
     public static Weapon unarmed = new Weapon("UNARMED", 0, "", AnimationPlayer.idleUnarmed, null);
-    public static Weapon knife = new Weapon("Knife", 1, "Rotation_Helper/Gun_Fire_Points/Knife_Point", AnimationPlayer.knifeIdle, AnimationPlayer.knifeFire);
+    // public static Weapon knife = new Weapon("Knife", 1, "Rotation_Helper/Gun_Fire_Points/Knife_Point", AnimationPlayer.knifeIdle, AnimationPlayer.knifeFire);
     public static Weapon pistol = new Weapon("PISTOL", 2, "Rotation_Helper/Gun_Fire_Points/Pistol_Point", AnimationPlayer.pistolIdle, AnimationPlayer.pistolFire);
-    public static Weapon rifle = new Weapon("Rifle", 3, "Rotation_Helper/Gun_Fire_Points/Rifle_Point", AnimationPlayer.rifleIdle, AnimationPlayer.rifleFire);
+    // public static Weapon rifle = new Weapon("Rifle", 3, "Rotation_Helper/Gun_Fire_Points/Rifle_Point", AnimationPlayer.rifleIdle, AnimationPlayer.rifleFire);
 
-    public static Weapon[] allWeapons = new Weapon[]{unarmed, knife, pistol, rifle};
+    public static Weapon[] allWeapons = new Weapon[]{unarmed, pistol};
 
     private Weapon currentWeapon = unarmed;
     private bool changingWeapon = false;
@@ -69,8 +69,14 @@ public class Player : KinematicBody
         camera = GetNode<Camera>("Rotation_Helper/Camera");
         rotationHelper = GetNode<Spatial>("Rotation_Helper");
         flashLight = GetNode<SpotLight>("Rotation_Helper/Flashlight");
-        animationPlayer = GetNode<AnimationPlayer>("Rotation_Helper/Model/Animation_Player");
+        GetAnimationPlayer();
         uiStatusLabel = GetNode<Label>("HUD/Panel/Gun_label");
+
+        if (animationPlayer == null) {
+            GD.Print("animation player null!");
+        } else {
+            GD.Print("animation player not null");
+        }
 
         Input.SetMouseMode(Input.MouseMode.Captured);
 
@@ -142,12 +148,12 @@ public class Player : KinematicBody
 
         if (Input.IsKeyPressed((int)KeyList.Key0)) {
             selectedWeapon = unarmed.number;
-        } else if (Input.IsKeyPressed((int)KeyList.Key1)) {
-            selectedWeapon = knife.number;
+        // } else if (Input.IsKeyPressed((int)KeyList.Key1)) {
+            // selectedWeapon = knife.number;
         } else if (Input.IsKeyPressed((int)KeyList.Key2)) {
             selectedWeapon = pistol.number;
-        } else if (Input.IsKeyPressed((int)KeyList.Key3)) {
-            selectedWeapon = rifle.number;
+        // } else if (Input.IsKeyPressed((int)KeyList.Key3)) {
+            // selectedWeapon = rifle.number;
         } else if (Input.IsKeyPressed((int)KeyList.Plus)) {
             selectedWeapon++;
         } else if (Input.IsKeyPressed((int)KeyList.Minus)) {
@@ -195,7 +201,44 @@ public class Player : KinematicBody
     }
 
     public void ProcessChangingWeapons(float delta) {
-        
+        if (!changingWeapon) {
+            return;
+        }
+
+        bool weaponUnequipped = false;
+
+        WeaponPoint currentPoint = currentWeapon.Instance(this);
+        if (currentPoint == null) {
+            weaponUnequipped = true;
+        } else {
+            if (currentPoint.isEnabled) {
+                weaponUnequipped = currentPoint.UnequipWeapon();
+            } else {
+                weaponUnequipped = true;
+            }
+        }
+
+        if (weaponUnequipped) {
+            bool weaponEquiped = false;
+
+            WeaponPoint changingWeaponPoint = changingWeaponType.Instance(this);
+            if (changingWeaponPoint == null) {
+                weaponEquiped = true;
+            } else {
+                if (changingWeaponPoint.isEnabled) {
+                    weaponEquiped = true;
+                } else {
+                    weaponEquiped = changingWeaponPoint.EquipWeapon();
+                }
+            }
+
+            if(weaponEquiped) {
+                changingWeapon = false;
+                currentWeapon = changingWeaponType;
+                changingWeaponType = null;
+            }
+        }
+
     }
 
     public override void _Input(InputEvent @event) {
@@ -216,6 +259,18 @@ public class Player : KinematicBody
     }
 
     public AnimationPlayer GetAnimationPlayer() {
+        if (animationPlayer == null) {
+            animationPlayer = GetNode<AnimationPlayer>("Rotation_Helper/Model/Animation_Player");
+        }
+        
         return animationPlayer;
+    }
+
+    public void FireWeapon() {
+        if (changingWeapon) {
+            return;
+        }
+
+        currentWeapon.Instance(this).FireWeapon();
     }
 }

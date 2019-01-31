@@ -1,20 +1,29 @@
 using Godot;
 using System;
 
-public class WeaponPistol : Spatial
+public class WeaponPistol : WeaponPoint
 {
     private const float damage = 15;
-
-    private bool weaponEnabled = false;
     private PackedScene bulletScene =  ResourceLoader.Load("Bullet_Scene.tscn") as PackedScene;
 
     public AnimationPlayer animationPlayer;
 
     public override void _Ready() {
-        animationPlayer = GetTree().Root.GetNode<Player>("Player").GetAnimationPlayer();
+        animationPlayer = GetNode<Player>("../../../").GetAnimationPlayer();
+
+        if (animationPlayer is AnimationPlayer) {
+            GD.Print("animation player not null in equip weapon");
+        } else {
+            if (animationPlayer != null) {
+                GD.Print("animation player is not instance in equip weapon: " + animationPlayer.GetType());
+            } else {
+                GD.Print("animation player is null in equip");
+            
+            }
+        }
     }
 
-    public void FireWeapon() {
+    public override void FireWeapon() {
         var clone = bulletScene.Instance() as Bullet;
         var sceneRoot = GetTree().Root.GetChildren()[0] as Spatial;
         sceneRoot.AddChild(clone);
@@ -24,9 +33,9 @@ public class WeaponPistol : Spatial
         clone.bulletDamage = damage;
     }
 
-    public bool EquipWeapon() {
+    public override bool EquipWeapon() {
         if (animationPlayer.CurrentAnimationState() == AnimationPlayer.pistolIdle) {
-            weaponEnabled = true;
+            isEnabled = true;
             return true;
         }
 
@@ -37,17 +46,25 @@ public class WeaponPistol : Spatial
         return false;
     }
 
-    public bool UnequipWeapon() {
+    public override bool UnequipWeapon() {
         if (animationPlayer.CurrentAnimationState() == AnimationPlayer.pistolIdle) {
             animationPlayer.SetAnimation(AnimationPlayer.pistolUnequip);
         }
 
         if (animationPlayer.CurrentAnimationState() == AnimationPlayer.idleUnarmed) {
-            weaponEnabled = false;
+            isEnabled = false;
             return true;
         } else {
             return false;
         }
     }
 
+}
+
+public abstract class WeaponPoint : Spatial {
+    public bool isEnabled = false;
+
+    public abstract bool UnequipWeapon();
+    public abstract bool EquipWeapon();
+    public abstract void FireWeapon();
 }

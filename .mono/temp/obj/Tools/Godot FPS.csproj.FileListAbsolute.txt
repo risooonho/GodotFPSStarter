@@ -4,3 +4,9 @@ C:\Users\ataboo\projects\GodotFPSStarter\.mono\temp\obj\Tools\Godot FPS.csprojAs
 C:\Users\ataboo\projects\GodotFPSStarter\.mono\temp\obj\Tools\Godot FPS.csproj.CoreCompileInputs.cache
 C:\Users\ataboo\projects\GodotFPSStarter\.mono\temp\obj\Tools\Godot FPS.dll
 C:\Users\ataboo\projects\GodotFPSStarter\.mono\temp\obj\Tools\Godot FPS.pdb
+D:\GodotProjects\GodotFPSTutorial\.mono\temp\obj\Tools\Godot FPS.csprojAssemblyReference.cache
+D:\GodotProjects\GodotFPSTutorial\.mono\temp\obj\Tools\Godot FPS.csproj.CoreCompileInputs.cache
+D:\GodotProjects\GodotFPSTutorial\.mono\temp\obj\Tools\Godot FPS.dll
+D:\GodotProjects\GodotFPSTutorial\.mono\temp\obj\Tools\Godot FPS.pdb
+D:\GodotProjects\GodotFPSTutorial\.mono\temp\bin\Tools\Godot FPS.dll
+D:\GodotProjects\GodotFPSTutorial\.mono\temp\bin\Tools\Godot FPS.pdb
